@@ -18,6 +18,7 @@ export const parseOrderText = async (text: string): Promise<AIParseResult> => {
     3. Extract order items (qty, name, price). 
        - Interpret prices like "44.000" or "15.000" as numbers 44000 and 15000 (dot is a thousand separator).
     4. Extract the total payment amount (Bayar).
+    5. Extract the table number (Meja) if present.
 
     Text to parse: "${text}"
   `;
@@ -41,6 +42,7 @@ export const parseOrderText = async (text: string): Promise<AIParseResult> => {
                 phone: { type: Type.STRING, nullable: true },
                 footer1: { type: Type.STRING, nullable: true },
                 footer2: { type: Type.STRING, nullable: true },
+                tableNumber: { type: Type.STRING, nullable: true },
               },
               nullable: true
             },

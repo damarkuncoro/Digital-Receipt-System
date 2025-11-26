@@ -1,3 +1,4 @@
+
 export interface OrderItem {
   id: string;
   qty: number;
@@ -14,6 +15,8 @@ export interface ReceiptConfig {
   footer1: string;
   footer2: string;
   cashierName: string;
+  tableNumber: string;
+  showTableNumber?: boolean;
 }
 
 export interface ReceiptData {

@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { ReceiptData } from '../types';
 
@@ -56,9 +57,10 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ data }) => {
             <p>Telp : {config.phone}</p>
           </div>
 
-          {/* Date */}
-          <div className="mb-2">
+          {/* Date & Table */}
+          <div className="mb-2 flex justify-between">
             <p>Tgl  : {formatDate(date)}</p>
+            {(config.showTableNumber ?? true) && <p>Meja : {config.tableNumber}</p>}
           </div>
 
           {/* Divider */}

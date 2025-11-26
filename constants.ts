@@ -1,3 +1,4 @@
+
 import { ReceiptData } from './types';
 
 export const DEFAULT_RECEIPT: ReceiptData = {
@@ -9,6 +10,8 @@ export const DEFAULT_RECEIPT: ReceiptData = {
     footer1: "Terima Kasih",
     footer2: "Selamat Menikmati",
     cashierName: "Admin",
+    tableNumber: "-",
+    showTableNumber: true,
   },
   // Date from input: 04/09/2025 12:30
   date: "2025-09-04T12:30:00.000Z", 
