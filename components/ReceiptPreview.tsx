@@ -57,10 +57,13 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ data }) => {
             <p>Telp : {config.phone}</p>
           </div>
 
-          {/* Date & Table */}
-          <div className="mb-2 flex justify-between">
-            <p>Tgl  : {formatDate(date)}</p>
-            {(config.showTableNumber ?? true) && <p>Meja : {config.tableNumber}</p>}
+          {/* Date, Table & Cashier */}
+          <div className="mb-2">
+            <div className="flex justify-between">
+              <p>Tgl  : {formatDate(date)}</p>
+              {(config.showTableNumber ?? true) && <p>Meja : {config.tableNumber}</p>}
+            </div>
+            {config.cashierName && <p>Kasir: {config.cashierName}</p>}
           </div>
 
           {/* Divider */}

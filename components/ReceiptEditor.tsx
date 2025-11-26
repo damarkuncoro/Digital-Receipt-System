@@ -67,6 +67,7 @@ export const ReceiptEditor: React.FC<ReceiptEditorProps> = ({ data, onChange, on
           phone: "(000) 000000",
           tableNumber: "-",
           showTableNumber: true,
+          cashierName: "Admin"
         }
       });
     }
@@ -270,6 +271,16 @@ export const ReceiptEditor: React.FC<ReceiptEditorProps> = ({ data, onChange, on
               className="p-2 border rounded text-sm w-full disabled:bg-gray-100 disabled:text-gray-400"
               placeholder="Table No."
               disabled={!(data.config.showTableNumber ?? true)}
+            />
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Cashier Name</label>
+            <input
+              type="text"
+              value={data.config.cashierName}
+              onChange={(e) => handleConfigChange('cashierName', e.target.value)}
+              className="p-2 border rounded text-sm w-full"
+              placeholder="Cashier Name"
             />
           </div>
           <div>
