@@ -12,6 +12,7 @@ export const DEFAULT_RECEIPT: ReceiptData = {
     cashierName: "Admin",
     tableNumber: "-",
     showTableNumber: true,
+    showCashierName: true,
   },
   // Date from input: 04/09/2025 12:30
   date: "2025-09-04T12:30:00.000Z", 

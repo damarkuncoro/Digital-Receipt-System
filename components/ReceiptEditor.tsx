@@ -67,7 +67,8 @@ export const ReceiptEditor: React.FC<ReceiptEditorProps> = ({ data, onChange, on
           phone: "(000) 000000",
           tableNumber: "-",
           showTableNumber: true,
-          cashierName: "Admin"
+          cashierName: "Admin",
+          showCashierName: true,
         }
       });
     }
@@ -274,13 +275,25 @@ export const ReceiptEditor: React.FC<ReceiptEditorProps> = ({ data, onChange, on
             />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">Cashier Name</label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs text-gray-500 block">Cashier Name</label>
+              <label className="flex items-center gap-1 cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  checked={data.config.showCashierName ?? true}
+                  onChange={(e) => handleConfigChange('showCashierName', e.target.checked)}
+                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-3 w-3"
+                />
+                <span className="text-[10px] text-gray-600">Show</span>
+              </label>
+            </div>
             <input
               type="text"
               value={data.config.cashierName}
               onChange={(e) => handleConfigChange('cashierName', e.target.value)}
-              className="p-2 border rounded text-sm w-full"
+              className="p-2 border rounded text-sm w-full disabled:bg-gray-100 disabled:text-gray-400"
               placeholder="Cashier Name"
+              disabled={!(data.config.showCashierName ?? true)}
             />
           </div>
           <div>

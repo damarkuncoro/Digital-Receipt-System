@@ -63,7 +63,7 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ data }) => {
               <p>Tgl  : {formatDate(date)}</p>
               {(config.showTableNumber ?? true) && <p>Meja : {config.tableNumber}</p>}
             </div>
-            {config.cashierName && <p>Kasir: {config.cashierName}</p>}
+            {(config.showCashierName ?? true) && config.cashierName && <p>Kasir: {config.cashierName}</p>}
           </div>
 
           {/* Divider */}

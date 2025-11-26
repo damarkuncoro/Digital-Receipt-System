@@ -17,6 +17,7 @@ export interface ReceiptConfig {
   cashierName: string;
   tableNumber: string;
   showTableNumber?: boolean;
+  showCashierName?: boolean;
 }
 
 export interface ReceiptData {
