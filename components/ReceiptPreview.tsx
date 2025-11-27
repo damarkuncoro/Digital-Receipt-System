@@ -32,14 +32,32 @@ const formatDate = (dateStr: string) => {
 export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ data }) => {
   const { config, items, paymentAmount, date } = data;
 
-  const totalAmount = useMemo(() => {
-    return items.reduce((sum, item) => sum + item.total, 0);
-  }, [items]);
+  const { subTotal, serviceCharge, tax, grandTotal } = useMemo(() => {
+    const sub = items.reduce((sum, item) => sum + item.total, 0);
+    
+    // Calculate Service Charge (usually on subtotal)
+    const srvRate = config.servicePercentage || 0;
+    const srv = Math.round(sub * (srvRate / 100));
 
-  const change = Math.max(0, paymentAmount - totalAmount);
+    // Calculate Tax (usually on subtotal + service, or just subtotal depending on region. 
+    // In Indo, PPN is often on the total taxable amount. We'll use Sub + Service)
+    const taxRate = config.taxPercentage || 0;
+    const tx = Math.round((sub + srv) * (taxRate / 100));
+
+    return {
+      subTotal: sub,
+      serviceCharge: srv,
+      tax: tx,
+      grandTotal: sub + srv + tx
+    };
+  }, [items, config.servicePercentage, config.taxPercentage]);
+
+  const change = Math.max(0, paymentAmount - grandTotal);
   
   // Calculate how many empty rows are needed to reach the minimum
   const emptyRows = Math.max(0, MIN_ROWS - items.length);
+
+  const showSummaryDetails = (config.taxPercentage || 0) > 0 || (config.servicePercentage || 0) > 0;
 
   return (
     <div className="w-fit mx-auto">
@@ -104,9 +122,31 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ data }) => {
 
           {/* Totals */}
           <div className="space-y-1 font-bold">
-            <div className="flex justify-between">
+            {showSummaryDetails && (
+              <>
+                <div className="flex justify-between">
+                  <span>SUBTOTAL</span>
+                  <span>{formatCurrency(subTotal)}</span>
+                </div>
+                {serviceCharge > 0 && (
+                  <div className="flex justify-between">
+                    <span>SERVICE ({config.servicePercentage}%)</span>
+                    <span>{formatCurrency(serviceCharge)}</span>
+                  </div>
+                )}
+                {tax > 0 && (
+                  <div className="flex justify-between">
+                    <span>PAJAK ({config.taxPercentage}%)</span>
+                    <span>{formatCurrency(tax)}</span>
+                  </div>
+                )}
+                <div className="border-b border-dashed border-black my-1 opacity-50"></div>
+              </>
+            )}
+            
+            <div className="flex justify-between text-base">
               <span>TOTAL</span>
-              <span>{formatCurrency(totalAmount)}</span>
+              <span>{formatCurrency(grandTotal)}</span>
             </div>
             <div className="flex justify-between">
               <span>BAYAR</span>

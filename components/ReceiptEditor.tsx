@@ -1,10 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ReceiptData, OrderItem } from '../types';
 import { parseOrderText } from '../services/geminiService';
-import { Loader2, Wand2, Plus, Trash2, Printer, RotateCcw, Download } from 'lucide-react';
+import { Loader2, Wand2, Plus, Trash2, Printer, RotateCcw, Download, Save } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { DEFAULT_RECEIPT } from '../constants';
 
 interface ReceiptEditorProps {
   data: ReceiptData;
@@ -16,8 +17,35 @@ export const ReceiptEditor: React.FC<ReceiptEditorProps> = ({ data, onChange, on
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [prompt, setPrompt] = useState('');
+  const [loaded, setLoaded] = useState(false);
 
-  const handleConfigChange = (key: string, value: string | boolean) => {
+  // Load from local storage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('pos_receipt_data');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Ensure config merges with defaults to get new fields if they didn't exist
+        const merged = {
+            ...parsed,
+            config: { ...DEFAULT_RECEIPT.config, ...parsed.config }
+        };
+        onChange(merged);
+      } catch (e) {
+        console.error("Failed to load saved data", e);
+      }
+    }
+    setLoaded(true);
+  }, []);
+
+  // Save to local storage on change
+  useEffect(() => {
+    if (loaded) {
+      localStorage.setItem('pos_receipt_data', JSON.stringify(data));
+    }
+  }, [data, loaded]);
+
+  const handleConfigChange = (key: string, value: string | boolean | number) => {
     onChange({
       ...data,
       config: { ...data.config, [key]: value },
@@ -55,22 +83,12 @@ export const ReceiptEditor: React.FC<ReceiptEditorProps> = ({ data, onChange, on
 
   const clearAll = () => {
     if (window.confirm("Are you sure you want to clear all items and details?")) {
-      onChange({
-        ...data,
+      const resetData = {
+        ...DEFAULT_RECEIPT,
         items: [],
         paymentAmount: 0,
-        config: {
-          ...data.config,
-          restaurantName: "RESTAURANT NAME",
-          addressLine1: "Address Line 1",
-          addressLine2: "City - Region",
-          phone: "(000) 000000",
-          tableNumber: "-",
-          showTableNumber: true,
-          cashierName: "Admin",
-          showCashierName: true,
-        }
-      });
+      };
+      onChange(resetData);
     }
   };
 
@@ -164,7 +182,12 @@ export const ReceiptEditor: React.FC<ReceiptEditorProps> = ({ data, onChange, on
     }
   };
 
-  const totalCalculated = data.items.reduce((acc, curr) => acc + curr.total, 0);
+  const { subTotal, grandTotal } = (() => {
+    const sub = data.items.reduce((acc, curr) => acc + curr.total, 0);
+    const srv = sub * ((data.config.servicePercentage || 0) / 100);
+    const tax = (sub + srv) * ((data.config.taxPercentage || 0) / 100);
+    return { subTotal: sub, grandTotal: sub + srv + tax };
+  })();
 
   // Helper to convert stored UTC date to local string for input[type="datetime-local"]
   const toLocalISOString = (dateStr: string) => {
@@ -376,13 +399,44 @@ export const ReceiptEditor: React.FC<ReceiptEditorProps> = ({ data, onChange, on
         </div>
       </div>
 
-      {/* Payment */}
+      {/* Payment & Taxes */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Payment Details</h3>
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600">Total Bill:</span>
-            <span className="font-bold text-lg">Rp {totalCalculated.toLocaleString('id-ID')}</span>
+        <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">Calculations</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Service Charge (%)</label>
+            <input
+              type="number"
+              value={data.config.servicePercentage || 0}
+              onChange={(e) => handleConfigChange('servicePercentage', parseFloat(e.target.value) || 0)}
+              className="p-2 border rounded text-sm w-full"
+              placeholder="0"
+              min="0"
+              max="100"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Tax / PPN (%)</label>
+            <input
+              type="number"
+              value={data.config.taxPercentage || 0}
+              onChange={(e) => handleConfigChange('taxPercentage', parseFloat(e.target.value) || 0)}
+              className="p-2 border rounded text-sm w-full"
+              placeholder="0"
+              min="0"
+              max="100"
+            />
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+          <div className="flex justify-between items-center text-sm text-gray-600">
+            <span>Subtotal:</span>
+            <span>Rp {subTotal.toLocaleString('id-ID')}</span>
+          </div>
+          <div className="flex justify-between items-center border-t border-gray-200 pt-2 mb-2">
+            <span className="text-sm font-semibold text-gray-800">Total Grand:</span>
+            <span className="font-bold text-lg text-indigo-700">Rp {Math.round(grandTotal).toLocaleString('id-ID')}</span>
           </div>
           <div>
              <label className="text-sm text-gray-600 block mb-1">Payment Amount (Bayar)</label>

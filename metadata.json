@@ -1,5 +1,5 @@
 {
-  "name": "Roso Joyo POS",
+  "name": "POS",
   "description": "A digital receipt generator for R.M Roso Joyo 2 with AI-powered order parsing and thermal printer styling.",
   "requestFramePermissions": []
 }

@@ -13,6 +13,8 @@ export const DEFAULT_RECEIPT: ReceiptData = {
     tableNumber: "-",
     showTableNumber: true,
     showCashierName: true,
+    taxPercentage: 0,
+    servicePercentage: 0,
   },
   // Date from input: 04/09/2025 12:30
   date: "2025-09-04T12:30:00.000Z", 

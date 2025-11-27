@@ -18,6 +18,8 @@ export interface ReceiptConfig {
   tableNumber: string;
   showTableNumber?: boolean;
   showCashierName?: boolean;
+  taxPercentage?: number;
+  servicePercentage?: number;
 }
 
 export interface ReceiptData {
